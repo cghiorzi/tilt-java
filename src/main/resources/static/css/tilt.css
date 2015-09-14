@@ -1,0 +1,17 @@
+h2 a {
+              color: black;
+}
+
+.pflogo {
+              width:60px;
+              float: right;
+              margin-right: 5px;
+}
+
+.collapse.width {
+              height: auto;
+              -webkit-transition: width 0.35s ease;
+              -moz-transition: width 0.35s ease;
+              -o-transition: width 0.35s ease;
+              transition: width 0.35s ease;
+}

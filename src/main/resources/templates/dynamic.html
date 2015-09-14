@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="utf-8"/>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <link href='css/bootstrap.min.css' rel="stylesheet"/>
+      <link href='css/bootstrap-theme.min.css' rel="stylesheet"/>
+      <link href='css/tilt.css' rel="stylesheet"/>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src='js/bootstrap.min.js'></script>
+
+  </head>
+  <body>
+  <div class="container">
+  <div class="row">
+      <h2><a href="http://tilt-view.cfapps.io"><img class="pflogo" src='images/Pathfinder-Logo.png'/></a>
+         <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info">Tilt Data Output</a></h2>
+            <div id="server_info" class="collapse" style="margin:10px;">
+                <p>CloudFoundry Instances 
+                <div class="dropdown">
+                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                         Number of Instances
+                        <!-- <span class="caret"></span> -->
+                     </button>
+                     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(1);return false;" href="#">1</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(2);return false;" href="#">2</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(3);return false;" href="#">3</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(4);return false;" href="#">4</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(5);return false;" href="#">5</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(6);return false;" href="#">6</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(7);return false;" href="#">7</a></li>
+                         <li role="presentation"><a role="menuitem" tabindex="-1" onclick="scale_app(8);return false;" href="#">8</a></li>
+        
+                     </ul>
+                 </div>
+                </p>
+            </div>
+  </div>
+  <div id="outputpanels" class="row">
+  </div>
+  </div>
+  <script src='js/tilt.js'></script> 
+  </body>  
+</html>

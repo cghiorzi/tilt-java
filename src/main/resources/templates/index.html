@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8"/>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+      <script src='js/bootstrap.min.js'></script>
+      <link href='css/bootstrap.min.css' rel="stylesheet"/>
+      <link href='css/bootstrap-theme.min.css' rel="stylesheet"/>
+      <style>  
+         .container {
+            -webkit-perspective: 300; perspective: 300;
+         }
+
+         .logo {
+             width:250px;
+             margin-left: auto;
+             margin-right: auto;
+             display: block;
+             padding: 15px;
+         }
+
+         .pflogo {
+             width:50px;
+             display: block;
+             float: left;
+             margin-left: 5px;
+         }
+
+         .row-centered {
+            text-align:center;
+         }
+
+         .col-centered {
+               display:inline-block;
+               float:none;
+               margin-right:-4px;
+         }
+
+        .vcenter {
+              height: 60px;
+              display: table-cell;
+              vertical-align: bottom;
+              float:none;
+        }
+
+      </style>
+
+  </head>
+  <body role="document">
+      <div class="container">
+  <div class="row">
+      <section class="panel panel-default">
+      <header class="panel-heading clearfix">
+          <h3 id="devid" class="panel-title pull-left" style="padding-top: 7.5px;">Device ID:&nbsp;&nbsp;<span id="devid_val"></span></h3>
+          <button class="btn btn-primary" style="float: right;" onclick="$('#settings').collapse('toggle')">Settings</button>
+      </header>
+      <div class="panel-body">
+          <div id="settings" class="collapse">
+                  <div id="device_id_form" class="form-group form-inline">
+                      <label for="device_id_alias">Device ID:</label>
+                      <div class="input-group">
+                          <input type="text" id="device_id_alias" maxlength="18" class="form-control" style="margin-left: 2px;"/>
+                          <div class="input-group-btn">
+                               <button class="btn btn-primary" onclick="setDevID()">Set</button>
+                           </div>
+                       </div>
+                  </div>
+                  <div class="form-group">
+                      <label for="gps_enabled">GPS Status: </label>
+                      <div class="btn-group" role="group">
+                          <button id="GPSenable" type="button" class="btn btn-default" onclick="toggleGPS()">Enabled</button>
+                          <button id="GPSdisable" type="button" class="btn btn-danger" onclick="toggleGPS()">Disabled</button>
+                      </div>
+                  </div>
+          </div>
+          <div class="row row-centered">
+                  <div class="col-centered text-center col-xs-3 col-md-3">
+                     <h4>Roll</h4>
+                     <input class="form-control" type="text" name="TiltLR" id="TiltLR" />
+                 </div>
+                 <div class="col-centered text-center col-xs-3 col-md-3">
+                     <h4>Pitch</h4>
+                     <input class="form-control" type="text" name="TiltFB" id="TiltFB" />
+                  </div>
+                  <div class="col-centered text-center col-xs-3 col-md-3">
+                      <h4>Yaw</h4>
+                      <input class="form-control" type="text" name="Direction" id="Direction" />
+                  </div>
+          </div>
+      </div>
+      </section>
+  </div>
+
+  <div class="container" style="-webkit-perspective: 300; perspective: 300;">
+    <img src='images/EMC-Logo.png' id="imgLogo" class="logo"/>
+  </div>
+
+  <div class="container">
+      <div class="row">
+           <div class="col-xs-3 col-md-3 text-center">
+               <img src="images/Pathfinder-Logo.png" id="pfLogo" class="pflogo"/>
+           </div>
+      </div>
+  </div>
+  </div>
+  <script type="text/javascript">
+    init();
+    var url = "/send";
+    var dev_id;
+    var GPS_enabled = 0;
+    var GPS_data = { latitude: 0, longitude: 0, altitude: 0 };
+    var update_count = 0;
+
+    function guid() {
+      function s4() {
+         return Math.floor((1 + Math.random()) * 0x10000)
+       .toString(16)
+       .substring(1)
+      }
+      return s4() + '-' + s4()
+    }
+
+    function toggleGPS() {
+        if (GPS_enabled == 0) {
+            $("#GPSdisable").removeClass('btn-danger');
+            $("#GPSdisable").addClass('btn-default');
+            $("#GPSenable").addClass('btn-success');
+            GPS_enabled = 1;
+            getGPSData();
+        } else {
+            $("#GPSenable").removeClass('btn-success');
+            $("#GPSenable").addClass('btn-default');
+            $("#GPSdisable").addClass('btn-danger');
+            GPS_enabled = 0;
+        }
+        console.log("Toggled GPS to:",GPS_enabled);
+    }
+
+    function checkDevID(new_devid) {
+        var letters = /^[A-Za-z0-9\-\_]+$/;
+
+        if (/^_+$/.test(new_devid)) {
+            return false;
+        }
+
+        if (letters.test(new_devid)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function setDevID() {
+        var newID =  $("#device_id_alias").val();
+        sanitized_ID = newID.replace(/ /gi,'_');
+        if (checkDevID(sanitized_ID) == true) {
+            // Cleanup The field
+            $("#device_id_form").removeClass("has-error");
+            $("#device_id_alias").attr("placeholder", "").val("").focus().blur();
+
+            // Update our values
+            $("#devid_val").text(sanitized_ID);
+            console.log("Unsanitized ID:",newID,"Sanitized ID:",sanitized_ID)
+            dev_id = sanitized_ID;
+        } else {
+            $("#device_id_form").addClass("has-error");
+            $("#device_id_alias").attr("placeholder", "Invalid Name").val("").focus().blur();
+            console.log("Device ID is not valid (must contain letters, numbers or -/_  spaces will be replaced with _)");
+        }
+    }
+
+    function init() {
+ 
+      dev_id = guid()
+      $("#devid_val").text(dev_id)
+
+      var os = "";
+      var ua = navigator.userAgent;
+      if ((ua.match(/iPad/i)) || (ua.match(/iPhone/i)) || (ua.match(/iPod/i))) {
+          os = "iOS";
+      } else if (ua.match(/Android/i)) {
+          os = "Android";
+      } else if (ua.match(/Windows/i)) {
+          os = "Windows";   
+      } else if ((ua.match(/Blackberry/i)) || (ua.match(/BB/i)) || (ua.match(/RIM/))) {
+          os = "Blackberry";
+      } else {
+          os = "Unknown";
+      }
+
+      if (window.DeviceOrientationEvent) {
+        // Listen for the deviceorientation event and handle the raw data
+        window.addEventListener('deviceorientation', function(eventData) {
+          // gamma is the left-to-right tilt in degrees, where right is positive
+          var tiltLR = eventData.gamma;
+          
+          // beta is the front-to-back tilt in degrees, where front is positive
+          var tiltFB = eventData.beta;
+          
+          // alpha is the compass direction the device is facing in degrees
+          var dir = eventData.alpha
+          
+          // call our orientation event handler
+          deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os);
+          }, false);
+      } else {
+        document.getElementById("doEvent").innerHTML = "Not supported on your device or browser.  Sorry."
+      }
+    }
+  
+function deviceOrientationHandler(tiltLR, tiltFB, dir, dev_id, os) {
+    var data;
+
+    document.getElementById("TiltLR").value = Math.round(tiltLR);
+    document.getElementById("TiltFB").value = Math.round(tiltFB);
+    document.getElementById("Direction").value = Math.round(dir);
+
+    if (GPS_enabled == 0) {
+        GPS_data.latitude = 0;
+        GPS_data.longitude = 0;
+        GPS_data.altitude = 0;
+    }
+
+    data = {devid: dev_id, 
+        TiltLR: checkNull(tiltLR), 
+        TiltFB: checkNull(tiltFB), 
+        Direction: checkNull(dir), 
+        OS: os,
+        latitude: GPS_data.latitude,
+        longitude: GPS_data.longitude,
+        altitude: GPS_data.altitude
+    };
+
+    // Apply the transform to the image
+    var logo = document.getElementById("imgLogo");
+    logo.style.webkitTransform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+    logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
+    logo.style.transform = "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
+
+    update_count++;
+    if (update_count == 5) {
+        $.ajax({
+        type: "POST",
+        url: url,
+        data: { data: JSON.stringify(data) }
+        }); 
+        update_count = 0;
+    }
+}
+    
+function checkNull(value) {
+    if (isNaN(value) || (value == null)) {
+        return 0;
+    } 
+
+    return value
+}
+
+function getGPSData() {
+    if (GPS_enabled == 1) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            GPS_data.latitude = checkNull(position.coords.latitude);
+            GPS_data.longitude = checkNull(position.coords.longitude);
+            GPS_data.altitude = checkNull(position.coords.altitude);
+        });
+    } else {
+        // Clear the GPS data if it's disabled
+        GPS_Data.latitude = 0;
+        GPS_Data.longitude = 0;
+        GPS_Data.altitude = 0;
+    }
+}  
+
+    // Update GPS Data every 5 minutes (assuming it's enabled)
+    setInterval(function(){
+               getGPSData();
+                  }, 300000);
+  </script>
+  
+
+</body>
+</html>
