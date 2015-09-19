@@ -1,0 +1,6 @@
+---
+applications:
+- name: tilt-java
+  memory: 512M
+  host: tilt-java
+  domain: cfapps.io
