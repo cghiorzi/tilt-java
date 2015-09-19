@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
       <meta charset="utf-8"/>
       <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -15,7 +15,7 @@
   <div class="container">
   <div class="row">
       <h2><a href="http://tilt-view.cfapps.io"><img class="pflogo" src='images/Pathfinder-Logo.png'/></a>
-         <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info">Tilt Data Output</a></h2>
+         <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info"><p th:text="${port}" /> Tilt Data Output</a></h2>
             <div id="server_info" class="collapse" style="margin:10px;">
                 <p>CloudFoundry Instances 
                 <div class="dropdown">

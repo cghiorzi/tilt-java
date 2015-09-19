@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 
 @Controller
 public class TiltController {
@@ -15,8 +16,9 @@ public class TiltController {
     }
     
     @RequestMapping(value = "/show", method = RequestMethod.GET)
-    public String showPage() {
-        return "dynamic";
+    public String showPage(String port, Model model) {
+    	port=System.getenv("PORT");
+    	return "dynamic";
     }
   
 
