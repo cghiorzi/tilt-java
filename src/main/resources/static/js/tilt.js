@@ -127,8 +127,8 @@ var panels = [];
         
        });
     } 
-    load_data();
+   /* load_data();
     setInterval(function(){
         load_data();
-    }, 500);
+    }, 500);*/
 

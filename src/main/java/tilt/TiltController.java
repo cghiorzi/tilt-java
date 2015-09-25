@@ -5,7 +5,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Map;
+
+import org.springframework.boot.json.JsonParser;
+import org.springframework.boot.json.JsonParserFactory;
+
+
 import org.springframework.ui.Model;
+
 
 @Controller
 public class TiltController {
@@ -16,20 +24,44 @@ public class TiltController {
     }
     
     @RequestMapping(value = "/show", method = RequestMethod.GET)
-    public String showPage(String port, Model model) {
-    	port=System.getenv("PORT");
+    public String showPage(String myport, Model model) {
+    	myport=System.getenv("PORT");
+    	model.addAttribute("port",myport);
     	return "dynamic";
     }
   
-
+    @RequestMapping(value = "/scale", method = RequestMethod.POST)
+    public String scaleInstances(@RequestParam(value="instances") String requestedInstances, Model model) {
+    	int instances=Integer.parseInt(requestedInstances);
+    	if ((instances > 8) || (instances < 1)) {
+            return "fail";
+    	} else {
+    		if (System.getenv("VCAP_APPLICATION") != null) {
+    			JsonParser jp=JsonParserFactory.getJsonParser();
+    			Map<String,Object> map = jp.parseMap(System.getenv("VCAP_APPLICATION"));
+    			String app_name=map.get("application_name").toString();
+                String app_url=map.get("application_uris").toString();
+    		}
+    		if (System.getenv("customconfig") != null) {
+    			JsonParser jp=JsonParserFactory.getJsonParser();
+    			Map<String,Object> map = jp.parseMap(System.getenv("customerconfig"));
+    		    String cf_user = map.get("cfuser").toString();
+    		    String cf_pass = map.get("cfpass").toString();
+    		    /*if (cf_user != null) {
+                    client = CloudFoundryClient(cf_user,cf_pass)
+                    client.authenticate()
+                    client.scale_app(app_url, instances)*/
+              }
+    	}
+                return "success";
+    	}
+    
+    /*/////////////////////////////
     @RequestMapping(value = "/safe_dump", method = RequestMethod.GET)
     public String dumpData(@RequestBody String jsonData, @RequestParam("min_score") String minScore ) {
         return jsonData;
     }
 
-    
-    /*/////////////////////////////
-    
    
 
     @app.route('/send', methods=['POST'])
@@ -79,19 +111,7 @@ public class TiltController {
                        instance=instances)
 
 
-    @app.route('/scale', methods=['POST'])
-    def scale_app():
-        new_instances = int(request.form['instances'])
-        if ((new_instances > 8) or (new_instances < 1)):
-            return "fail"
-        else:
-            if cf_user:
-                client = CloudFoundryClient(cf_user,cf_pass)
-                client.authenticate()
-                app_data = client.get_app(app_name)
-                client.scale_app(app_data['url'], new_instances)
-
-        return "success"
+   
 
 
     @app.route('/view')

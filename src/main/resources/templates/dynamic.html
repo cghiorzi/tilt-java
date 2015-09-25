@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
       <meta charset="utf-8"/>
-      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1"/>
       <link href='css/bootstrap.min.css' rel="stylesheet"/>
       <link href='css/bootstrap-theme.min.css' rel="stylesheet"/>
@@ -15,7 +15,7 @@
   <div class="container">
   <div class="row">
       <h2><a href="http://tilt-view.cfapps.io"><img class="pflogo" src='images/Pathfinder-Logo.png'/></a>
-         <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info"><p th:text="${port}" /> Tilt Data Output</a></h2>
+         <a style="padding-top:10px" data-toggle="collapse" data-target="#server_info">Tilt Data Output</a></h2>
             <div id="server_info" class="collapse" style="margin:10px;">
                 <p>CloudFoundry Instances 
                 <div class="dropdown">
@@ -38,6 +38,7 @@
                 </p>
             </div>
   </div>
+  <p th:text="'Port is ' + ${port}" />
   <div id="outputpanels" class="row">
   </div>
   </div>
